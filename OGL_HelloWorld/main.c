@@ -6,8 +6,8 @@ int height = 480;
 void init(int argc, char** argv) {
 	glutInit(&argc, argv);					// Initialisierung der GLUT Bibliothek
 	glutInitDisplayMode(GLUT_SINGLE);		// Initialisierung des Single Buffer Modes
-	glutInitWindowSize(width, height);		// Fenstergröße in Pixel (Breite, Hoehe)
-	glutInitWindowPosition(100, 100);		// Fensterposition in Pixel, ausgehend vom Ursprung des Window Systems
+	glutInitWindowSize(2*width, height);		// Fenstergröße in Pixel (Breite, Hoehe)
+	glutInitWindowPosition(2*100, 100);		// Fensterposition in Pixel, ausgehend vom Ursprung des Window Systems
 	glViewport(0, 0, width, height);
 	glutCreateWindow("Hello world");		// Erstellen des Fensters
 	glMatrixMode(GL_PROJECTION);
