@@ -28,6 +28,17 @@ void display(void)
 	GLfloat myColor[3] = { 0.0,0.0,1.0 };
 	glColor3fv(myColor);
 
+	
+	glBegin(GL_POLYGON); // Rechteck
+	glVertex3f((width / 2) - (width / 4) - 50, (height / 2) - (height / 4) - 50, 0.0);
+	glVertex3f((width / 2) + (width / 4) - 50, (height / 2) - (height / 4) - 50, 0.0);
+	glVertex3f((width / 2) + (width / 4) - 50, (height / 2) + (height / 4) - 50, 0.0);
+	glVertex3f((width / 2) - (width / 4) - 50, (height / 2) + (height / 4) - 50, 0.0);
+	glEnd();
+
+	GLfloat myColor2[3] = { 1.0,1.0,0.0 };
+	glColor3fv(myColor2);
+
 	glBegin(GL_POLYGON);
 	glVertex3f((width / 2), (height / 2) + (height / 4), 0.0);
 	glVertex3f((width / 2) + (width / 4), (height / 2) - (height / 4), 0.0);
