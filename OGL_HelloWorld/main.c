@@ -25,13 +25,14 @@ void display(void)
 	glClearColor(0.0, 1.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glColor3f(1.0, 0.0, 0.0);
+	GLfloat myColor[3] = { 0.0,0.0,1.0 };
+	glColor3fv(myColor);
 
 	glBegin(GL_POLYGON);
-	glVertex3f((width / 2) - (width / 4), (height / 2) - (height / 4), 0.0);
-	glVertex3f((width / 2) + (width / 4), (height / 2) - (height / 4), 0.0);
-	glVertex3f((width / 2) + (width / 4), (height / 2) + (height / 4), 0.0);
-	glVertex3f((width / 2) - (width / 4), (height / 2) + (height / 4), 0.0);
+	glVertex3f((width / 2) - (width / 4)+50, (height / 2) - (height / 4)+50, 0.0);
+	glVertex3f((width / 2) + (width / 4)+50, (height / 2) - (height / 4)+50, 0.0);
+	glVertex3f((width / 2) + (width / 4)+50, (height / 2) + (height / 4)+50, 0.0);
+	glVertex3f((width / 2) - (width / 4)+50, (height / 2) + (height / 4)+50, 0.0);
 	glEnd();
 
 	glColor3f(1.0, 1.0, 1.0);
