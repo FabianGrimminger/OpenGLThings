@@ -21,6 +21,10 @@ void display(void)
 	char *myText = "Hello World!";
 	int j;
 
+	
+	glClearColor(0.0, 1.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	glColor3f(1.0, 0.0, 0.0);
 
 	glBegin(GL_POLYGON);
