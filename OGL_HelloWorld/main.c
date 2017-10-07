@@ -1,65 +1,107 @@
 #include <GL/glut.h>
+#include <stdio.h>
 
 int width = 640;
 int height = 480;
 
-void init(int argc, char** argv) {
-	glutInit(&argc, argv);					// Initialisierung der GLUT Bibliothek
-	glutInitDisplayMode(GLUT_SINGLE);		// Initialisierung des Single Buffer Modes
-	glutInitWindowSize(2*width, height);		// Fenstergröße in Pixel (Breite, Hoehe)
-	glutInitWindowPosition(2*100, 100);		// Fensterposition in Pixel, ausgehend vom Ursprung des Window Systems
-	glViewport(0, 0, width, height);
-	glutCreateWindow("Hello world");		// Erstellen des Fensters
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0, width, 0, height);
-	glMatrixMode(GL_MODELVIEW);
-}
+float _angle = 0.0;
+float _cameraangle = 30.0;
 
 void display(void)
-{
-	char *myText = "Hello World!";
-	int j;
+{	
+	glMatrixMode(GL_MODELVIEW); // Den richtigen Stack aktivieren
+	glLoadIdentity();              // Die Matrix zurücksetzen
 
-	
-	glClearColor(0.0, 1.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glTranslatef(0, 0, -3.5);
+	//glRotatef(-20, 1, 0, 0);
+	glRotatef(_angle, 0, 1, 0);
 
-	GLfloat myColor[3] = { 0.0,0.0,1.0 };
-	glColor3fv(myColor);
+	glClearColor(0, 0, 0,0.0);
+	glClear(GL_COLOR_BUFFER_BIT |GL_DEPTH_BUFFER_BIT); //Bildbuffer löschen							  
 
-	
-	glBegin(GL_POLYGON); // Rechteck
-	glVertex3f((width / 2) - (width / 4) - 50, (height / 2) - (height / 4) - 50, 0.0);
-	glVertex3f((width / 2) + (width / 4) - 50, (height / 2) - (height / 4) - 50, 0.0);
-	glVertex3f((width / 2) + (width / 4) - 50, (height / 2) + (height / 4) - 50, 0.0);
-	glVertex3f((width / 2) - (width / 4) - 50, (height / 2) + (height / 4) - 50, 0.0);
+	glBegin(GL_QUADS);
+
+	glColor3f(1, 0, 0); //türkis?
+	glVertex3f(-1, -1, -1);
+	glColor3f(1, 1, 0);
+	glVertex3f(1, -1, -1);
+	glColor3f(0,1, 0);
+	glVertex3f(1, -1, 1);
+	glColor3f(0, 0, 1);
+	glVertex3f(-1, -1, 1);
+
 	glEnd();
 
-	GLfloat myColor2[3] = { 1.0,1.0,0.0 };
-	glColor3fv(myColor2);
-
-	glBegin(GL_POLYGON);
-	glVertex3f((width / 2), (height / 2) + (height / 4), 0.0);
-	glVertex3f((width / 2) + (width / 4), (height / 2) - (height / 4), 0.0);
-	glVertex3f((width / 2) - (width / 4), (height / 2) - (height / 4), 0.0);
+	glBegin(GL_TRIANGLES);
+	
+	glVertex3f(-1, -1, 1);
+	glColor3f(0, 1, 0);   //  grün
+	glVertex3f(0.0, 1.0, 0.0);	
+	glVertex3f(1, -1, 1);
 	glEnd();
 
-	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos2i((width / 2) - (width / 4) + 10, (height / 2) - (height / 4) + 10);
-	for (j = 0; j<strlen(myText); j++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, myText[j]);
-	}
+	glBegin(GL_TRIANGLES);
+	
+	glVertex3f(1, -1, 1);
+	glColor3f(1, 1, 0); //gelb
+	glVertex3f(0.0, 1.0, 0.0);
+	glVertex3f(1, -1, -1);
+	glEnd();
 
-	glFlush();
+	glBegin(GL_TRIANGLES);
+	
+	glVertex3f(1, -1, -1);
+	glColor3f(1, 0, 0);   //  rot
+	glVertex3f(0, 1, 0);
+	glVertex3f(-1, -1, -1);	
+	glEnd();
+
+	glBegin(GL_TRIANGLES);
+	
+	glVertex3f(-1, -1, -1);
+	glColor3f(0, 0, 1); //blau
+	glVertex3f(0.0, 1.0, 0.0);	
+	glVertex3f(-1, -1, 1);	
+	glEnd(); 
+
+	glutSwapBuffers();
 }
 
+void update(int value)
+{
+	_angle += 2.0f;
+	if (_angle > 360.f)
+	{
+		_angle -= 360;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(25, update, 0);
+}
+
+//wird am anfang einmal durchlaufen
+void handleResize(int w, int h)
+{
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	//gluPerspective(45.0, (double)w / (double)h, 1.0, 200.0);
+	glFrustum(-1.6, 1.6, -1.2, 1.2, 1.5, 6.5);
+}
 
 int main(int argc, char** argv)
 {
-	init(argc, argv);
-	glutDisplayFunc(display);				// Callback-Funktion für das Fenster
-	glutMainLoop();							// Abgabe der Kontrolle an GLUT-Bibliothek
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitWindowSize(800, 600);
+	glutCreateWindow("rotate");
+
+	glEnable(GL_DEPTH_TEST);
+
+	glutDisplayFunc(display);
+	glutReshapeFunc(handleResize);
+
+	glutTimerFunc(25, update, 0);
+
+	glutMainLoop();
 	return 0;
 }
-
