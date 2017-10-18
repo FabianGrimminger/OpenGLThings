@@ -21,7 +21,7 @@ void init(int argc, char** argv) {
 	////////////////////////////////////////////////////////////////////
 
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 
 
 	////////////////////////////////////////////////////////////////////
@@ -64,10 +64,14 @@ void display(void)
 
 	glColor3f(0.0f, 0.0f, 1.0f);
 	// BOTTOM
-	glVertex3f(-0.5f, -0.5f, 0.5f);
-	glVertex3f(-0.5f, -0.5f, -0.5f);
-	glVertex3f(0.5f, -0.5f, -0.5f);
 	glVertex3f(0.5f, -0.5f, 0.5f);
+	glVertex3f(0.5f, -0.5f, -0.5f);
+	glVertex3f(-0.5f, -0.5f, -0.5f);
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+	
+	
+	
+	
 	glEnd();
 
 	glFlush();
