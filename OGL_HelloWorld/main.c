@@ -65,7 +65,7 @@ void drawCoordinateSystem(float* origin, int xLength, int yLength, int numTicksX
 		glVertex2f(origin[0] + j, origin[1] - 5);
 		glVertex2f(origin[0] + j, origin[1] + 5);
 		glEnd();
-		//sprintf(label, "%5.2f", minX + (j*resX));
+		sprintf_s(label,10, "%5.2f", minX + (j*resX));
 		glRasterPos2i(origin[0] + j - (8 * 5), origin[1] - 13 - 10);
 		for (k = 0; k<5; k++) {
 			glutBitmapCharacter(GLUT_BITMAP_8_BY_13, label[k]);
@@ -78,7 +78,8 @@ void drawCoordinateSystem(float* origin, int xLength, int yLength, int numTicksX
 		glVertex2f(origin[0] - 5, origin[1] + j);
 		glVertex2f(origin[0] + 5, origin[1] + j);
 		glEnd();
-		//sprintf(label, "%5.2f", minY + (j*resY));
+		sprintf_s(label,10, "%5.2f", minY + (j*resY));
+		//sprintf(label, "5.2f", minY + (j*resY));
 		glRasterPos2i(origin[0] - (8 * 5) - 10, origin[1] + j - 13 / 2);
 		for (k = 0; k<5; k++) {
 			glutBitmapCharacter(GLUT_BITMAP_8_BY_13, label[k]);
@@ -94,18 +95,16 @@ void drawCircle(float origin[2], float center[2], float radius, GLint numPoints)
 	//		hint: see circle equation in parametric form 
 	// - position points in the coordinate system starting at given origin
 	// - draw the points by OpenGL commands
-	
-	
+	float x, y;
 
+	glBegin(GL_POINTS);
+	for (float i = 0; i < 2 * PI; i = i + (2 * PI) / numPoints) {
+		x = origin[0] + center[0] + radius*cos(i);
+		y = origin[1] + center[1] + radius*sin(i);
 
-
-
-
-
-
-
-
-
+		glVertex2f(x, y);
+	}
+	glEnd();
 	//////////////////////////////////////////////////////////////////////////////////////////////
 }
 
@@ -152,7 +151,18 @@ void display(void)
 		///////////////////////////////////////////////////////////////////////////////
 		// - set the point size different for each loop iteration
 		// - set the color different for each loop iteration
-
+		if (n == 0) {
+			glPointSize(2);
+			glColor3f(1.0, 0.0, 0.0);
+		}
+		else if (n == 1) {
+			glPointSize(4);
+			glColor3f(0.0, 1.0, 0.0);
+		}
+		else if (n == 2) {
+			glPointSize(8);
+			glColor3f(0.0, 0.0, 1.0);
+		}
 
 
 
