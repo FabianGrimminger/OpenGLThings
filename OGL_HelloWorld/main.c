@@ -86,8 +86,8 @@ void displaycloud(int modus)
 		if (modus == 1 || modus == 4) { // Display only the vertices
 										//////////////////////
 										// TODO: set fill mode to render only the vertices
-
-
+			
+			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
 
 
@@ -98,7 +98,7 @@ void displaycloud(int modus)
 										//////////////////////
 										// TODO: set fill mode to render only outlines
 
-
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
 
@@ -108,7 +108,7 @@ void displaycloud(int modus)
 										//////////////////////
 										// TODO: set fill mode to render filled polygons
 
-
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
 
@@ -136,8 +136,8 @@ void displaycloud(int modus)
 			// one triangle consists of 3 consecutive entries of ccoord, i.e. 
 			// first triangle consists of the vertices referenced in ccoord[0], ccords[1], ccoord[2]. 
 
-
-
+			
+			glVertex3f(cpoints[ccoord[i] * 3], cpoints[ccoord[i] * 3+1], cpoints[ccoord[i] * 3+2]);
 
 
 
@@ -163,13 +163,13 @@ void display(void)
 		//		 - vertices are rotated as given by the user input.
 		//       - use zoff to define the zoom with glOrtho
 
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(-2, 2, -2, 2, -2, 2);
 
-
-
-
-
-
-
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		gluLookAt(0, 0, 0.1, 0, 0, 0, 0, 1, 0);
 
 
 		/////////////////////////////////////////////////////////////////////////
@@ -180,13 +180,13 @@ void display(void)
 		// note: - use gluPerspective here.
 		//		 - use zoff to define the zoom with gluLookAt
 
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(45, 1, 3.0, 7.0);
 
-
-
-
-
-
-
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		gluLookAt(0, 0, 5 + zoff, 0, 0, 0, 0, 1, 0);
 
 
 
