@@ -59,13 +59,12 @@ float shininess = 2;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // FARBEN DER LICHT KOMPONENTEN
-
-
-
-
+float ambientLightColor[3] = { 0.1,0.1,0.1 };
+float diffuseLightColor[3] = { 0.5,0.5,0.5 };
+float specularLightColor[3] = { 1.0,1.0,1.0 };
 
 // LICHT POSITION 
-
+float lightPosition[4] = { 0,0,1,1 };
 
 
 
@@ -179,14 +178,12 @@ void displaycloud(int modus)
 			if (lights == 1) {
 				////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// MATERIAL DEFINTION 
-
-
-
-
-
-
-
-
+				
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, currentColor);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, currentColor);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, currentColor);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+				
 
 
 				////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,21 +221,23 @@ void display(void) {
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// LIGHT DEFINITION
 
+		glEnable(GL_LIGHT0);
+		glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLightColor);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLightColor);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, specularLightColor);
+		glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
-
-
-
+		glEnable(GL_LIGHTING);
 
 
 		// SHADING DEFINTION
 		if (shading == 0) { // Flat Shading
-
+			glShadeModel(GL_FLAT);
 		}
 		else if (shading == 1) { // Gouraud Shading
-
+			glShadeModel(GL_SMOOTH);
 		}
-
-
+		
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
