@@ -21,8 +21,10 @@ void setProjection(int projType);
 void setAntiAliasing(int state);
 
 float cpoints[3 * 60000];
+float cvnormals[3 * 60000];
 float ccolors[3 * 60000];
 int ccoord[10 * 3 * 60000];
+float cnormals[10 * 3 * 60000];
 int maxcoords = 0;
 float cpointsmax[3];
 float cpointsmin[3];
@@ -46,7 +48,32 @@ float startxoff;
 float startyoff;
 float startzoff;
 
+int aa = 0;
+
+// default values
 int projType = PERSPECTIVE; // default: perspective projection
+int lights = 0;
+int shading = 0;
+float shininess = 2;
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// FARBEN DER LICHT KOMPONENTEN
+
+
+
+
+
+// LICHT POSITION 
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// short cut color white
+float white[3] = { 0.5, 0.5, 0.5 };
 
 int main(int argc, char** argv)
 {
@@ -69,137 +96,184 @@ int main(int argc, char** argv)
 	printf(" rechte Maustaste und x-y-Bewegung -> Translation\n\n");
 	printf("Projektionsart aendern:\n");
 	printf("'o' orthographische Projektion, 'p' perspektivische Projektion \n\n");
+	printf("'a' Antialiasing ein/ausschalten:\n\n");
+	printf("Licht Optionen\n");
+	printf(" 's'     : Shading Modus aendern (Flat / Gouraud)\n");
+	printf(" 'l'     : Licht ein-/ausschalten\n");
+	printf(" '+'/'-' : Spekular-Exponent aendern\n\n");
 	glutMainLoop();
 	return 0;
 }
+
+
+
+void setAA() {
+	if (aa == 1) {
+		// ENABLE ANTIALIASING
+		////////////////////////////////////////////////////////////////
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_LINE_SMOOTH);
+		glEnable(GL_POLYGON_SMOOTH);
+
+
+
+		////////////////////////////////////////////////////////////////
+
+	}
+	else {
+		// DISABLE ANTIALIASING
+		////////////////////////////////////////////////////////////////
+		glDisable(GL_POINT_SMOOTH);
+		glDisable(GL_LINE_SMOOTH);
+		glDisable(GL_POLYGON_SMOOTH);
+
+
+
+
+		////////////////////////////////////////////////////////////////
+	}
+	glutPostRedisplay();
+}
+
+
 
 void displaycloud(int modus)
 {
 	int i = 0;
 	float range[3];
+	float directionVector[3][2];
+	float n[3];
+	float currentColor[3];
+	int counter = 0;
+
+	glEnable(GL_NORMALIZE);
+	glFrontFace(GL_CW);
+
 	for (i = 0; i<3; i++)
 		range[i] = cpointsmax[i] - cpointsmin[i];
 	if (modus>0)
 	{
-
-
-		if (modus == 1 || modus == 4) { // Display only the vertices
-										//////////////////////
-										// TODO: set fill mode to render only the vertices
-			
+		if (modus == 1 || modus == 4) { // Darstellung von Punkten
 			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-
-
-
-
-										/////////////////////
 		}
-		if (modus == 2 || modus == 5) { // Display the outlines of the polygons
-										//////////////////////
-										// TODO: set fill mode to render only outlines
-
+		if (modus == 2 || modus == 5) { // Darstellung des Drahtgittermodells
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
-
-										//////////////////////
 		}
-		if (modus == 3 || modus == 6) { // Display filled polygons
-										//////////////////////
-										// TODO: set fill mode to render filled polygons
-
+		if (modus == 3 || modus == 6) { // Darstellung gefüllter Polygone
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
-
-										/////////////////////
 		}
-		glBegin(GL_TRIANGLES); // using the polygone mode "GL_TRIANGLES"
+		glBegin(GL_TRIANGLES);
 		for (i = 0; i< maxcoords + 1; i++)
 		{
-			if (modus>3) { // Displaying colors saved in the mesh file (node wise definition!)
-				glColor3f(ccolors[ccoord[i] * 3], ccolors[ccoord[i] * 3 + 1], ccolors[ccoord[i] * 3 + 2]);
+			if (modus>3) { // Darstellung der Farben aus dem Mesh-File
+				currentColor[0] = ccolors[ccoord[i] * 3];
+				currentColor[1] = ccolors[ccoord[i] * 3 + 1];
+				currentColor[2] = ccolors[ccoord[i] * 3 + 2];
 			}
-			else {  // Displaying interpolated colors according to the x-/y-/z-value of the point coordinates (node wise definition!)
-				glColor3f((cpoints[ccoord[i] * 3] - cpointsmin[0]) / range[0], (cpoints[ccoord[i] * 3 + 1] - cpointsmin[1]) / range[1], (cpoints[ccoord[i] * 3 + 2] - cpointsmin[2]) / range[2]);
+			else {  // Darstellung der interpolierten Farben entsprechend der Koordinaten
+				currentColor[0] = (cpoints[ccoord[i] * 3] - cpointsmin[0]) / range[0];
+				currentColor[1] = (cpoints[ccoord[i] * 3 + 1] - cpointsmin[1]) / range[1];
+				currentColor[2] = (cpoints[ccoord[i] * 3 + 2] - cpointsmin[2]) / range[2];
 			}
-			// Definition of vertices
-			/////////////////////////////////////////////////////////////////////
-			// TODO: definition of vertices.
 
-			// note the data structures: cpoints holds all coordinate components in a 1D array: 
-			// node j_x can be accessed via cpoints[j*3]
-			// node j_y can be accessed via cpoints[j*3+1]
-			// node j_z can be accessed via cpoints[j*3+2]
-
-			// note the data structure: ccoord holds the indices into the cpoints array in a 1D array:
-			// one triangle consists of 3 consecutive entries of ccoord, i.e. 
-			// first triangle consists of the vertices referenced in ccoord[0], ccords[1], ccoord[2]. 
-
-			
-			glVertex3f(cpoints[ccoord[i] * 3], cpoints[ccoord[i] * 3+1], cpoints[ccoord[i] * 3+2]);
+			if (lights == 1) {
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// MATERIAL DEFINTION 
 
 
 
-			/////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+			}
+			else {
+				glColor3f(currentColor[0], currentColor[1], currentColor[2]);
+			}
+
+			// for flat shading: one normal per triangle (before defintion of vertices) is sufficient
+			// cnormals contains the surface normal
+			if (counter == 0) {
+				if (shading == 0) {
+					glNormal3f(cnormals[i], cnormals[i + 1], cnormals[i + 2]);
+				}
+			}
+			counter++;
+			if (counter == 3) {
+				counter = 0;
+			}
+
+			// for gouraud shading we need the normal of each vertex
+			// cvnormals contains the vertex normals
+			if (shading == 1) {
+				glNormal3f(cvnormals[ccoord[i] * 3], cvnormals[ccoord[i] * 3 + 1], cvnormals[ccoord[i] * 3 + 2]);
+			}
+
+			glVertex3f(cpoints[ccoord[i] * 3], cpoints[ccoord[i] * 3 + 1], cpoints[ccoord[i] * 3 + 2]);
 		}
 		glEnd();
-
 	}
 
 }
-void display(void)
-{
+void display(void) {
+	if (lights == 1) {
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// LIGHT DEFINITION
+
+
+
+
+
+
+
+		// SHADING DEFINTION
+		if (shading == 0) { // Flat Shading
+
+		}
+		else if (shading == 1) { // Gouraud Shading
+
+		}
+
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	}
+	else {
+		glDisable(GL_LIGHTING);
+	}
+
+	// projection switch
+	switch (projType) {
+	case ORTHO:
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(-2 - zoff, 2 + zoff, -2 - zoff, 2 + zoff, -2, 10);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		gluLookAt(0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+		break;
+
+	case PERSPECTIVE:
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(45.0, 1.0, 3.0, 7.0);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		gluLookAt(0, 0, 5 + zoff, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+		break;
+	}
+
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 	glPushMatrix();
-
-	switch (projType) {
-	case ORTHO:
-		///////////////////////////////////////////////////////////////////////// 
-		// note: - vertices are initially all in the range between [-1 1].
-		//		 - vertices are rotated as given by the user input.
-		//       - use zoff to define the zoom with glOrtho
-
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(-2, 2, -2, 2, -2, 2);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		gluLookAt(0, 0, 0.1, 0, 0, 0, 0, 1, 0);
-
-
-		/////////////////////////////////////////////////////////////////////////
-		break;
-
-	case PERSPECTIVE:
-		/////////////////////////////////////////////////////////////////////////
-		// note: - use gluPerspective here.
-		//		 - use zoff to define the zoom with gluLookAt
-
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(45, 1, 3.0, 7.0);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		gluLookAt(0, 0, 5 + zoff, 0, 0, 0, 0, 1, 0);
-
-
-
-		/////////////////////////////////////////////////////////////////////////
-		break;
-
-	}
-
-
-
-	glPushMatrix();
-
-	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	glColor3f(0.0, 0.0, 0.0);
 	// center and rotate
@@ -208,8 +282,12 @@ void display(void)
 	glRotatef(angle1, 0.0, 1.0, 0.0);
 	//display
 	displaycloud(displaymodus);
-	// draw box
 
+	// draw box
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, white);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, white);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, white);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_LINE_LOOP);
 	glVertex3f(cpointsmax[0], cpointsmax[1], cpointsmax[2]);
@@ -238,9 +316,29 @@ void display(void)
 	glutSwapBuffers(); // Buffer for animation needs to be swapped
 }
 
+
 void init(void)
 {
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
+	///////////////////////////////////////////////////////////////////////////////////////
+	// ENABLING z-BUFFER
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glClearDepth(1);
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////////////////
+
+
 	glClearColor(0.99, 0.99, 0.99, 0.0);
 	glLoadIdentity();
 	xoff = 0.0;
@@ -249,7 +347,6 @@ void init(void)
 	zoom = 1;
 	angle1 = 45;
 	angle2 = 45;
-
 }
 
 
@@ -273,10 +370,19 @@ void readcloud(char* filename)
 
 	int i = 0;
 	int j = 0;
+	int k = 0;
+	int numVertices = 0;
+	int counter = 0;
+	float directionVector[3][2];
+	float n[3];
+	float x, y, z;
+	float temp;
+	int index;
+	int indexBegin;
+	int numNeighbouringFaces = 0;
 	FILE * f;
 	int abbruch = 0;
 	char str[200] = "";
-	float temp;
 	printf("Lese '%s' ein\n", filename);
 	f = fopen(filename, "r");
 	printf("Ueberspringe Kopf...\n");
@@ -377,6 +483,50 @@ void readcloud(char* filename)
 			cpoints[j + 1] = temp;
 		}
 	}
+
+	printf("Berechne Flächen- und Vertexnormalen...\n");
+	counter = 0;
+	for (i = 0; i<maxcoords + 1; i++) {
+		if (counter == 0) {
+			// Richtungsvektoren der Ebene aus jeweils zwei Seiten des Dreiecks
+			directionVector[0][0] = cpoints[ccoord[i + 1] * 3] - cpoints[ccoord[i] * 3];
+			directionVector[1][0] = cpoints[ccoord[i + 1] * 3 + 1] - cpoints[ccoord[i] * 3 + 1];
+			directionVector[2][0] = cpoints[ccoord[i + 1] * 3 + 2] - cpoints[ccoord[i] * 3 + 2];
+
+			directionVector[0][1] = cpoints[ccoord[i + 2] * 3] - cpoints[ccoord[i] * 3];
+			directionVector[1][1] = cpoints[ccoord[i + 2] * 3 + 1] - cpoints[ccoord[i] * 3 + 1];
+			directionVector[2][1] = cpoints[ccoord[i + 2] * 3 + 2] - cpoints[ccoord[i] * 3 + 2];
+
+			// Normalenvektor als Kreuzprodukt der beiden Seiten
+			n[0] = (directionVector[1][0] * directionVector[2][1]) - (directionVector[2][0] * directionVector[1][1]);
+			n[1] = (directionVector[2][0] * directionVector[0][1]) - (directionVector[0][0] * directionVector[2][1]);
+			n[2] = (directionVector[0][0] * directionVector[1][1]) - (directionVector[1][0] * directionVector[0][1]);
+
+			// Normalenvektor in Array speichern
+			cnormals[i] = n[0];
+			cnormals[i + 1] = n[1];
+			cnormals[i + 2] = n[2];
+
+			// Aufaddieren der Normalen an den Betroffenen Vertices, die das Dreieck bilden
+			cvnormals[ccoord[i] * 3] = cvnormals[ccoord[i] * 3] + n[0];
+			cvnormals[ccoord[i] * 3 + 1] = cvnormals[ccoord[i] * 3 + 1] + n[1];
+			cvnormals[ccoord[i] * 3 + 2] = cvnormals[ccoord[i] * 3 + 2] + n[2];
+
+			cvnormals[ccoord[i + 1] * 3] = cvnormals[ccoord[i + 1] * 3] + n[0];
+			cvnormals[ccoord[i + 1] * 3 + 1] = cvnormals[ccoord[i + 1] * 3 + 1] + n[1];
+			cvnormals[ccoord[i + 1] * 3 + 2] = cvnormals[ccoord[i + 1] * 3 + 2] + n[2];
+
+			cvnormals[ccoord[i + 2] * 3] = cvnormals[ccoord[i + 2] * 3] + n[0];
+			cvnormals[ccoord[i + 2] * 3 + 1] = cvnormals[ccoord[i + 2] * 3 + 1] + n[1];
+			cvnormals[ccoord[i + 2] * 3 + 2] = cvnormals[ccoord[i + 2] * 3 + 2] + n[2];
+
+		}
+		counter++;
+		if (counter == 3) {
+			counter = 0;
+		}
+	}
+	printf("... beendet.\n");
 }
 
 
@@ -443,6 +593,8 @@ void define_menu()
 {
 }
 
+
+
 void key(unsigned char k, int x, int y)
 {
 	switch (k) {
@@ -462,6 +614,41 @@ void key(unsigned char k, int x, int y)
 		projType = PERSPECTIVE;
 		printf("Projektion: PERSPECTIVE\n");
 		glutPostRedisplay();
+		break;
+	case 'l':
+		if (lights == 0)
+			lights = 1;
+		else
+			lights = 0;
+		break;
+	case '+':
+		shininess = shininess + 0.1;
+		printf("  Shininess: %f\n", shininess);
+		break;
+	case '-':
+		shininess = shininess - 0.1;
+		printf("  Shininess: %f\n", shininess);
+		break;
+	case 's':
+		if (shading == 1) {
+			shading = 0;
+			printf("  Shading = FLAT\n");
+		}
+		else if (shading == 0) {
+			shading = 1;
+			printf("  Shading = GOURAUD\n");
+		}
+		break;
+	case 'a':
+		if (aa == 1) {
+			aa = 0;
+			printf("  Antialiasing ausgeschaltet\n");
+		}
+		else {
+			aa = 1;
+			printf("  Antialiasing eingeschaltet\n");
+		}
+		setAA();
 		break;
 	default:
 		if (k>'0' - 1 && k<'7')
